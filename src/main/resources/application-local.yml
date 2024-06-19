@@ -1,0 +1,15 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          tanzu-local-authorization-server:
+            client-id: default-client-id
+            client-secret: default-client-secret
+            scope:
+              - openid
+              - email
+              - profile
+        provider:
+          tanzu-local-authorization-server:
+            issuer-uri: http://localhost:9000

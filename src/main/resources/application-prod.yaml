@@ -1,0 +1,15 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          azure:
+            client-id: "<REDACTED>"
+            client-secret: "<REDACTED>"
+            scope:
+              - openid
+              - email
+              - profile
+        provider:
+          azure:
+            issuer-uri: "https://login.microsoftonline.com/<REDACTED>/v2.0"
