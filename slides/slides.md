@@ -14,7 +14,7 @@ canvasWidth: 720
 
 <br>
 
-Daniel Garnier-Moiroux, 2024-06-19
+Daniel Garnier-Moiroux, 2024-07-09
 
 ---
 
@@ -61,7 +61,7 @@ https://github.com/pivotal-cf/tanzu-local-authorization-server
 
 <br>
 
-`AppSSO` on Google Chat
+`Spring TSL` or `AppSSO` on Google Chat
 
 <br>
 
