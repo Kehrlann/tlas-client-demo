@@ -18,6 +18,9 @@ class SecurityConfiguration {
                     auth.requestMatchers("/fr/**").access((authSupplier, object) -> {
                         OidcUser user = (OidcUser) authSupplier.get().getPrincipal();
                         var groups = user.getClaimAsStringList("groups");
+                        if (groups == null) {
+                            return new AuthorizationDecision(false);
+                        }
                         return new AuthorizationDecision(groups.contains("France_Staff"));
                     });
                     auth.anyRequest().authenticated();
