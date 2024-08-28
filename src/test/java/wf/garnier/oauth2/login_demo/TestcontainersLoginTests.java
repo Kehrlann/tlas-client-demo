@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers(disabledWithoutDocker = true)
-class LoginTests {
+class TestcontainersLoginTests {
 
     @LocalServerPort
     int port;
@@ -32,9 +32,9 @@ class LoginTests {
     @Container
     static GenericContainer<?> tanzuAuthServer = new GenericContainer<>("bellsoft/liberica-openjre-alpine:21")
             .withCopyFileToContainer(
-                    MountableFile.forClasspathResource("authserver.jar"), "/tanzu-local-authorization-server.jar")
+                    MountableFile.forClasspathResource("tanzu-local-authorization-server/authserver.jar"), "/tanzu-local-authorization-server.jar")
             .withCopyFileToContainer(
-                    MountableFile.forClasspathResource("config.yml"), "/config.yml")
+                    MountableFile.forClasspathResource("tanzu-local-authorization-server/config.yml"), "/config.yml")
             .withCommand("java", "-jar", "/tanzu-local-authorization-server.jar", "--config", "config.yml")
             .withExposedPorts(9000);
 

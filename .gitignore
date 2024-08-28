@@ -1,6 +1,4 @@
-src/test/resources/*.jar
-src/test/resources/authserver-config.yml
-src/test/resources/config.yml
+src/test/resources/**/*.jar
 
 HELP.md
 .gradle

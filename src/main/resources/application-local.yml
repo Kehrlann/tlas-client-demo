@@ -6,6 +6,7 @@ spring:
           tanzu-local-authorization-server:
             client-id: default-client-id
             client-secret: default-client-secret
+            client-name: Tanzu Local Authorization Server
             scope:
               - openid
               - email
