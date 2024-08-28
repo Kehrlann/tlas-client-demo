@@ -9,16 +9,16 @@ import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Testcontainers(disabledWithoutDocker = true)
@@ -65,6 +65,17 @@ class TestcontainersLoginTests {
         Page frenchPage = webClient.getPage("http://localhost:" + port + "/fr");
         assertThat(indexPage.getBody().getTextContent()).contains("Hello, bob@example.com");
         assertThat(frenchPage.getWebResponse().getStatusCode()).isEqualTo(403);
+    }
+
+    @Test
+    void logout() throws IOException {
+        login("bob", "bob-password");
+
+        HtmlPage indexPage = webClient.getPage("http://localhost:" + port);
+        HtmlPage logoutPage = indexPage.getAnchorByText("Logout").click();
+        HtmlPage loggedOutIndexPage = logoutPage.<HtmlButton>querySelector("button").click();
+
+        assertThat(loggedOutIndexPage.getBody().getTextContent()).contains("You have been signed out");
     }
 
     private void login(String username, String password) throws IOException {

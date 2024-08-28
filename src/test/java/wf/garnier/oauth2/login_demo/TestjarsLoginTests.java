@@ -58,6 +58,17 @@ class TestjarsLoginTests {
         assertThat(frenchPage.getWebResponse().getStatusCode()).isEqualTo(403);
     }
 
+    @Test
+    void logout() throws IOException {
+        login("bob", "bob-password");
+
+        HtmlPage indexPage = webClient.getPage("http://localhost:" + port);
+        HtmlPage logoutPage = indexPage.getAnchorByText("Logout").click();
+        HtmlPage loggedOutIndexPage = logoutPage.<HtmlButton>querySelector("button").click();
+
+        assertThat(loggedOutIndexPage.getBody().getTextContent()).contains("You have been signed out");
+    }
+
     private void login(String username, String password) throws IOException {
         HtmlPage loginPage = webClient.getPage("http://localhost:" + port);
 
