@@ -18,7 +18,7 @@ TLAS is part of the [Tanzu Spring enterprise suite](https://enterprise.spring.io
 Required:
 
 - Java 17+
-- Tanzu Local Authorization Server,
+- Tanzu Local Authorization Server v0.0.7 or higher,
   see [docs on how to obtain](https://docs.vmware.com/en/Tanzu-Spring-Runtime/Commercial/Tanzu-Spring-Runtime/local-auth-server-about-local-auth-server.html)
 
 Optional:
