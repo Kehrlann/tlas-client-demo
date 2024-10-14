@@ -1,0 +1,20 @@
+tanzu:
+  local-authorization-server:
+    users:
+      - username: alice
+        password: alice-password
+        attributes:
+          # email is a standard OpenID claim, obtained with the email scope
+          email: "alice@example.com"
+          # roles is a custom, application-specific claim
+          roles:
+            - viewer
+            - editor
+            - admin
+      - username: bob
+        password: bob-password
+        attributes:
+          email: bob@example.com
+          roles:
+            - viewer
+            - editor

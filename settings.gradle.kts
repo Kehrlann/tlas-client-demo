@@ -1,1 +1,1 @@
-rootProject.name = "login-demo"
+rootProject.name = "tlas-blog"

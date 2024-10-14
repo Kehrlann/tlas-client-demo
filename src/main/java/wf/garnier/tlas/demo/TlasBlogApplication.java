@@ -1,13 +1,13 @@
-package wf.garnier.oauth2.login_demo;
+package wf.garnier.tlas.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LoginDemoApplication {
+public class TlasBlogApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(LoginDemoApplication.class, args);
+		SpringApplication.run(TlasBlogApplication.class, args);
 	}
 
 }
