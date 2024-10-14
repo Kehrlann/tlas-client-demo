@@ -91,66 +91,106 @@ You should see a welcome message, **Hello, user@example.com**.
 
 ### Running demo: role-based access control (RBAC)
 
-Real-world use-cases often must manage authorization based on information about the logged in user, for example using
-their roles or attributes.
-
-You may have noticed that in the main page of our application, there is a link for "French employees
-only", http://localhost:8080/fr. If you try to access that link with `user@example.com`, access will be denied with
-`HTTP 403 Forbidden`. The rule is that the user must be part of the `France_Staff` group, expressed in our
-`SecurityConfiguration` class, through the access control rule:
+In real-world use-cases, requirements often include authorization based on information about the
+logged in user, for example using their roles or attributes. Authorizations can be implemented in
+many ways in Spring Security. In this example, provide a `OidcUserService` bean to map an `id_token`
+claim to user "roles". These roles can then be used to lock down or open up access. For fine-grained
+configuration, provide a `SecurityFilterChain` bean:
 
 ```java
-auth.requestMatchers("/fr/**").access(mustBeFrenchEmployee());
-```
 
-With the actual implementation:
+@Configuration
+class DemoConfiguration {
+    @Bean
+    OidcUserService oidcUserService() {
+        var oidcUserService = new OidcUserService();
+        oidcUserService.setOidcUserMapper((oidcUserRequest, oidcUserInfo) -> {
+            // Will map the "roles" claim from the `id_token` into user authorities (roles)
+            var roles = oidcUserRequest.getIdToken().getClaimAsStringList("roles");
+            var authorities = AuthorityUtils.createAuthorityList();
+            if (roles != null) {
+                roles.stream()
+                        .map(r -> "ROLE_" + r)
+                        .map(SimpleGrantedAuthority::new)
+                        .forEach(authorities::add);
+            }
+            return new DefaultOidcUser(authorities, oidcUserRequest.getIdToken(), oidcUserInfo);
+        });
+        return oidcUserService;
+    }
 
-```java
-private static AuthorizationManager<RequestAuthorizationContext> mustBeFrenchEmployee() {
-    return (authSupplier, object) -> {
-        OidcUser user = (OidcUser) authSupplier.get().getPrincipal();
-        var groups = user.getClaimAsStringList("groups");
-        if (groups == null) {
-            return new AuthorizationDecision(false);
-        }
-        return new AuthorizationDecision(groups.contains("France_Staff"));
-    };
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/admin/**").hasRole("admin");
+                    auth.anyRequest().authenticated();
+                })
+                .oauth2Login(Customizer.withDefaults())
+                .build();
+    }
 }
 ```
 
-However, our `user@example.com` does not have the `French_Staff` group. We need to configure TLAS so it has users with
-that group. You can use the file `tlas-config.yml` in this repo:
+Add an `/admin` endpoint that can be consumed in the controller:
 
-```
-java -jar tanzu-local-authorization-server-*.jar --config tlas-config.yml
+```java
+
+@RestController
+class DemoController {
+
+    @GetMapping("/")
+    String index(@AuthenticationPrincipal OidcUser user) {
+        return "Hello " + user.getEmail();
+    }
+
+    @GetMapping("/admin")
+    String admin() {
+        return "Hello, admin!";
+    }
+
+}
 ```
 
-The config file has two users, `alice` (pw: `alice-password`), member of `France_Staff`; and `bob` (pw: `bob-password`),
-not member of `France_Staff`:
+
+Lastly, configure Tanzu Local Authorization Server, with two users: `alice`, who has an `admin` role
+granting her privileges in the client app, and `bob` with a regular, non-admin account:
+
 
 ```yaml
+
 tanzu:
   local-authorization-server:
     users:
       - username: alice
         password: alice-password
         attributes:
-          email: "alice.spring@example.com"
-          # ... omitted ...
-          groups:
-            - "spring.user"
-            - "France_Staff"
+          # email is a standard OpenID claim, obtained with the email scope
+          email: "alice@example.com"
+          # roles is a custom, application-specific claim
+          roles:
+            - viewer
+            - editor
+            - admin
       - username: bob
         password: bob-password
         attributes:
           email: bob@example.com
-          groups:
-            - "spring.user"
-            - "UK_Staff"
+          roles:
+            - viewer
+            - editor
 ```
 
-Restart your application, and try navigating to the French employees page logged in as `alice` (works) or `bob` (returns
-HTTP 403).
+Then, run the Auth Server using this configuration file:
+
+```shell
+
+java -jar tanzu-local-authorization-server-<VERSION>.jar --config=config.yml
+```
+
+Now access your client application's newly created admin page at http://localhost:8080/admin : only
+`alice` should be able to access the page. Use incognito mode in your browser so switching users is
+easy and does not require implementing logout.
 
 ## Using Tanzu Local Authorization Server in tests
 

@@ -4,25 +4,17 @@ tanzu:
       - username: alice
         password: alice-password
         attributes:
-          name: "Alice J. Spring"
-          given_name: "Alice"
-          family_name: "Spring"
-          middle_name: "Java"
-          nickname: "Spring"
-          preferred_username: "ajspring"
-          profile: "https://spring.io/team"
-          picture: "https://spring.io/img/spring-2.svg"
-          website: "https://spring.io"
-          email: "alice.spring@example.com"
-          email_verified: true
-
-          groups:
-            - "spring.user"
-            - "France_Staff"
+          # email is a standard OpenID claim, obtained with the email scope
+          email: "alice@example.com"
+          # roles is a custom, application-specific claim
+          roles:
+            - viewer
+            - editor
+            - admin
       - username: bob
         password: bob-password
         attributes:
           email: bob@example.com
-          groups:
-            - "spring.user"
-            - "UK_Staff"
+          roles:
+            - viewer
+            - editor
